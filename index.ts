@@ -1,21 +1,5 @@
-interface IUser {
-    id: number;
-    nome: string;
-    idade: number;
-    calendar: {
-        day: number;
-        time: {
-            hour: number;
-            minute: number;
-            test: {
-                value: string;
-            };
-        };
-    };
-}
-
 const data: IUser[] = [];
-for (let i = 0; i < 500; i++) {
+for (let i = 0; i < 105000; i++) {
     const user: IUser = {
         id: i + 1,
         nome: `User ${i + 1}`,
@@ -35,6 +19,22 @@ for (let i = 0; i < 500; i++) {
     data.push(user);
 }
 
+interface IUser {
+    id: number;
+    nome: string;
+    idade: number;
+    calendar: {
+        day: number;
+        time: {
+            hour: number;
+            minute: number;
+            test: {
+                value: string;
+            };
+        };
+    };
+}
+
 type TNotOperator<T> = { value: T };
 
 type TWhere<T> = {
@@ -47,6 +47,8 @@ class NotOperator<T> implements TNotOperator<T> {
         this.value = value;
     }
 }
+
+
 
 function checkNotOperator<T>(value: T | NotOperator<T>): value is NotOperator<T> {
     return value instanceof NotOperator;
@@ -106,11 +108,18 @@ function Not<T>(arg: T) {
 }
 
 setTimeout(() => {
-    const user = one<IUser>({ calendar: { time: { test: { value: 'Test 400' } } } });
-    console.log(user);
-}, 3000)
+    const start = Date.now();
+    const user = one<IUser>({ calendar: { time: { test: { value: 'Test 46800' } } } });
+    const end = Date.now();
+    const execution = end - start;
+    console.log(`Finded ${JSON.stringify(user)} records of ${data.length} in ${execution} ms.`);
+}, 3000);
+
 setTimeout(() => {
+    const start = Date.now();
     const users = many<IUser>({ calendar: { time: { hour: 12 } } });
     console.log(users.length);
-    console.log(users);
-}, 3500)
+    const end = Date.now();
+    const execution = end - start;
+    console.log(`Finded ${users.length} records of ${data.length} in ${execution} ms.`);
+}, 3500);
