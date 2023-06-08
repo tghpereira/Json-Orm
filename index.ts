@@ -1,3 +1,19 @@
+interface IUser {
+    id: number;
+    nome: string;
+    idade: number;
+    calendar: {
+        day: number;
+        time: {
+            hour: number;
+            minute: number;
+            test: {
+                value: string;
+            };
+        };
+    };
+}
+
 const data: IUser[] = [];
 for (let i = 0; i < 500; i++) {
     const user: IUser = {
@@ -19,22 +35,6 @@ for (let i = 0; i < 500; i++) {
     data.push(user);
 }
 
-interface IUser {
-    id: number;
-    nome: string;
-    idade: number;
-    calendar: {
-        day: number;
-        time: {
-            hour: number;
-            minute: number;
-            test: {
-                value: string;
-            };
-        };
-    };
-}
-
 type TNotOperator<T> = { value: T };
 
 type TWhere<T> = {
@@ -47,8 +47,6 @@ class NotOperator<T> implements TNotOperator<T> {
         this.value = value;
     }
 }
-
-
 
 function checkNotOperator<T>(value: T | NotOperator<T>): value is NotOperator<T> {
     return value instanceof NotOperator;
