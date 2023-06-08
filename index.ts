@@ -15,7 +15,7 @@ interface IUser {
 }
 
 const data: IUser[] = [];
-for (let i = 0; i < 500; i++) {
+for (let i = 0; i < 1000000; i++) {
   const user: IUser = {
     id: i + 1,
     nome: `User ${i + 1}`,
@@ -41,8 +41,6 @@ type TWhere<T> = {
   [K in keyof T]?: T[K] | TNotOperator<T[K]> | TWhere<T[K]>;
 };
 
-type u = Partial<TWhere<IUser>>
-
 class NotOperator<T> implements TNotOperator<T> {
   value: T;
   constructor(value: T) {
@@ -50,13 +48,13 @@ class NotOperator<T> implements TNotOperator<T> {
   }
 }
 
-function checkNotOperator<T>(value: T | NotOperator<T>): value is NotOperator<T> {
+function checkNotOperator<T>(value: T | TNotOperator<T>): value is TNotOperator<T> {
   return value instanceof NotOperator;
 }
 
-function match<T>(item: T, criteria: TWhere<T>): boolean {
-  for (const key in criteria) {
-    const target = criteria[key];
+function match<T>(item: T, where: Partial<TWhere<T>>): boolean {
+  for (const key in where) {
+    const target = where[key];
     const value = item[key as keyof T];
     if (checkNotOperator(target)) {
       if (target.value === value) return false;
@@ -69,18 +67,18 @@ function match<T>(item: T, criteria: TWhere<T>): boolean {
   return true;
 }
 
-function search<T>(data: T[], criteria: TWhere<T>, callback: (item: T) => void) {
-  for (const item of data) if (match(item, criteria)) callback(item);
+function search<T>(data: T[], where: Partial<TWhere<T>>, callback: (item: T) => void) {
+  for (const item of data) if (match(item, where)) callback(item);
 }
 
-function many<T>(criteria: TWhere<T>): T[] {
+function many<T>(where: Partial<TWhere<T>>): T[] {
   const results: T[] = [];
-  search(data, criteria, item => results.push(item as T));
+  search(data, where, item => results.push(item as T));
   return results;
 }
 
-function one<T>(criteria: TWhere<T>): T | null {
-  for (const item of data) if (match(item, criteria)) return item as T;
+function one<T>(where: Partial<TWhere<T>>): T | null {
+  for (const item of data) if (match(item, where)) return item as T;
   return null;
 }
 
@@ -90,15 +88,15 @@ function Not<T>(arg: T) {
 
 setTimeout(() => {
   const start = Date.now();
-  const user = one<IUser>({ calendar: { time: { test: { value: 'Test 366' } } } });
+  const user = one<IUser>({ calendar: { time: { test: { value: 'Test 368756' } } } });
   const end = Date.now();
   const execution = end - start;
   console.log(`Finded ${JSON.stringify(user)} records of ${data.length} in ${execution} ms.`);
-}, 3000);
+}, 3000); 
 
 setTimeout(() => {
   const start = Date.now();
-  const users = many<IUser>({ calendar: { time: { hour: 12 } } });
+  const users = many<IUser>({ calendar: { time: { hour: Not(12) } } });
   console.log(users.length);
   const end = Date.now();
   const execution = end - start;
